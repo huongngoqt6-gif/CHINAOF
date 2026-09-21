@@ -2,12 +2,23 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-# 1. Đọc dữ liệu từ file Excel
 file_path = "O.F China lane Analysis.xlsx"
-sheet_name = "OF"
 
-# Đọc dữ liệu
-df = pd.read_excel(file_path, sheet_name=sheet_name)
+# Tự động dò tìm tên sheet an toàn
+xls = pd.ExcelFile(file_path)
+sheet_to_use = None
+
+for s in xls.sheet_names:
+  # So sánh không phân biệt hoa thường và loại bỏ khoảng trắng thừa
+  if s.strip().upper() == "OF":
+    sheet_to_use = s
+    break
+
+# Nếu tìm thấy thì dùng, nếu không thì lấy sheet đầu tiên (index = 0)
+if sheet_to_use:
+  df = pd.read_excel(file_path, sheet_name=sheet_to_use)
+else:
+  df = pd.read_excel(file_path, sheet_name=0)
 
 # 2. Tùy chọn lọc theo Lane (Tuyến)
 # Thay đổi giá trị bên dưới thành tên Lane bạn muốn lọc, hoặc để None nếu muốn xem toàn bộ
