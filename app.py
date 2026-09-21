@@ -41,6 +41,8 @@ df["Gap_BaseRate_20"] = df["SR 20'"] - df["OF BR 20'"]
 df["Gap_BaseRate_40"] = df["SR 40'"] - df["OF BR 40'"]
 
 # 4. Thiết lập và vẽ biểu đồ
+filter_lane = None  # Hoặc tên lane bạn muốn lọc
+
 fig, axes = plt.subplots(3, 1, figsize=(12, 14), sharex=True)
 sns.set_theme(style="whitegrid")
 
