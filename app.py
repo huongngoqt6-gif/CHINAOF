@@ -1,37 +1,28 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import streamlit as st
 
+# 1. Đọc dữ liệu từ file Excel
 file_path = "O.F China lane Analysis.xlsx"
+df = pd.read_excel(file_path, sheet_name="OF")
 
-# Tự động dò tìm tên sheet an toàn
-xls = pd.ExcelFile(file_path)
-sheet_to_use = None
+# Làm sạch tên cột (loại bỏ khoảng trắng thừa ở tên cột)
+df.columns = df.columns.str.strip()
 
-for s in xls.sheet_names:
-  # So sánh không phân biệt hoa thường và loại bỏ khoảng trắng thừa
-  if s.strip().upper() == "OF":
-    sheet_to_use = s
-    break
+# 2. Xử lý cột ETD (Định dạng kiểu 21-Sep-26)
+# Dùng errors='coerce' để nếu ô nào lỗi thì chuyển thành NaT thay vì sập app
+# Dùng format='mixed' giúp pandas tự linh hoạt đọc các kiểu chuỗi ngày tháng
+df["ETD"] = pd.to_datetime(df["ETD"], errors="coerce", format="mixed")
 
-# Nếu tìm thấy thì dùng, nếu không thì lấy sheet đầu tiên (index = 0)
-if sheet_to_use:
-  df = pd.read_excel(file_path, sheet_name=sheet_to_use)
-else:
-  df = pd.read_excel(file_path, sheet_name=0)
-
-# 2. Tùy chọn lọc theo Lane (Tuyến)
-# Thay đổi giá trị bên dưới thành tên Lane bạn muốn lọc, hoặc để None nếu muốn xem toàn bộ
-filter_lane = None  # Ví dụ: filter_lane = "CN-SGN"
-
-if filter_lane:
-  df = df[df["Lane"] == filter_lane]
-
-# Chuyển đổi cột ETD sang định dạng datetime, các giá trị lỗi sẽ tự động chuyển thành NaT
-df["ETD"] = pd.to_datetime(df["ETD"], errors="coerce")
-
-# Loại bỏ các dòng có giá trị ETD bị trống/lỗi để tránh làm lỗi biểu đồ
+# Kiểm tra số lượng dòng trước và sau khi lọc ngày để debug trên màn hình
+total_rows_before = len(df)
 df = df.dropna(subset=["ETD"])
+total_rows_after = len(df)
+
+st.write(
+    f"📊 Kiểm tra dữ liệu: Tổng số dòng ban đầu là {total_rows_before}, số dòng sau khi lọc ngày hợp lệ là {total_rows_after}"
+)
 
 # Sắp xếp lại theo thời gian ETD
 df = df.sort_values("ETD")
