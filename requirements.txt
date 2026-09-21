@@ -3,3 +3,8 @@ pandas
 openpyxl
 plotly
 numpy
+Plaintext
+pandas
+matplotlib
+seaborn
+openpyxl
