@@ -27,8 +27,13 @@ filter_lane = None  # Ví dụ: filter_lane = "CN-SGN"
 if filter_lane:
   df = df[df["Lane"] == filter_lane]
 
-# Chuyển đổi cột ETD sang định dạng datetime và sắp xếp theo thời gian
-df["ETD"] = pd.to_datetime(df["ETD"])
+# Chuyển đổi cột ETD sang định dạng datetime, các giá trị lỗi sẽ tự động chuyển thành NaT
+df["ETD"] = pd.to_datetime(df["ETD"], errors="coerce")
+
+# Loại bỏ các dòng có giá trị ETD bị trống/lỗi để tránh làm lỗi biểu đồ
+df = df.dropna(subset=["ETD"])
+
+# Sắp xếp lại theo thời gian ETD
 df = df.sort_values("ETD")
 
 # 3. Tính toán các khoảng gap theo yêu cầu
